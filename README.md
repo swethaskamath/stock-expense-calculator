@@ -9,7 +9,12 @@ A single-page, responsive calculator for the total cost of buying and selling st
 - Segments: Equity Delivery, Equity Intraday, Futures, Options
 - Exchanges: NSE, BSE
 - Charges: brokerage (editable), STT, exchange transaction charges, SEBI turnover fee, GST, stamp duty, DP charges
-- Output: total charges, gross and net P&L, breakeven move per unit, charges as % of turnover
+- Output: every charge split into buy side, sell side and total; total charges, gross and net P&L, breakeven sell price, charges as % of turnover
+- Buy-only mode: leave the sell price empty to see just the cost of buying
+
+## Deployment
+
+GitHub Pages serves the `gh-pages` branch. Push changes to both `main` and `gh-pages`.
 
 ## Rates used (as of Nov 2026)
 

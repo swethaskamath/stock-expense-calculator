@@ -4,57 +4,83 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stock Trade Charges Calculator (India)</title>
+<meta name="description" content="Calculate brokerage, STT, exchange charges, GST, stamp duty and DP charges on Indian stock trades: delivery, intraday, futures and options.">
 <style>
   :root{
-    --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#5f6b7a; --line:#e3e6eb;
-    --accent:#1f6feb; --pos:#11823b; --neg:#c62828; --soft:#eef3fd;
+    --bg:#f4f6fa; --card:#fff; --ink:#18202a; --muted:#5f6b7a; --line:#e4e8ee;
+    --accent:#2563eb; --accent-ink:#fff; --pos:#127a3a; --neg:#c62828; --soft:#eef3fd;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.06);
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#0f1216; --card:#171b21; --ink:#e7eaee; --muted:#98a2b0; --line:#2a3038;
-      --accent:#5b9dff; --pos:#4cc47a; --neg:#ff6b6b; --soft:#1c2431; }
+    :root{ --bg:#0e1116; --card:#161b22; --ink:#e7eaee; --muted:#98a2b0; --line:#262d36;
+      --accent:#5b9dff; --accent-ink:#0b1220; --pos:#4cc47a; --neg:#ff6b6b; --soft:#1a2230;
+      --shadow:none; }
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
-  .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
-  h1{font-size:1.4rem;margin:0 0 4px}
-  .sub{color:var(--muted);margin:0 0 18px;font-size:.92rem}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:760px){.grid{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .card h2{font-size:1rem;margin:0 0 12px}
-  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
-  .seg button,.ex button{border:1px solid var(--line);background:transparent;color:var(--ink);padding:9px 4px;border-radius:8px;font-size:.88rem;cursor:pointer}
-  .seg button.on,.ex button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-  .ex{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
-  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
-  input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:1rem}
-  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0}
+  header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff}
+  header .wrap{padding-top:26px;padding-bottom:26px}
+  header h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.01em}
+  header p{margin:0;opacity:.85;font-size:.92rem}
+  .wrap{max-width:1040px;margin:0 auto;padding:20px 16px}
+  main.wrap{margin-top:-14px;padding-top:0}
+  .grid{display:grid;grid-template-columns:5fr 6fr;gap:16px;align-items:start}
+  @media (max-width:800px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .card h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 12px}
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px;background:var(--bg);padding:4px;border-radius:10px}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:16px;background:var(--bg);padding:4px;border-radius:10px;max-width:200px}
+  .seg button,.ex button{border:0;background:transparent;color:var(--ink);padding:8px 4px;border-radius:7px;font-size:.86rem;cursor:pointer;font-weight:500}
+  .seg button.on,.ex button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:500}
+  .opt{font-weight:400;opacity:.8}
+  input,select{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font-size:1rem}
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px;background:var(--card)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px}
   @media (max-width:420px){.row3{grid-template-columns:1fr 1fr}}
-  details{margin-top:6px;border-top:1px solid var(--line);padding-top:10px}
+  details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
   summary{cursor:pointer;font-size:.9rem;font-weight:600}
-  .hint{font-size:.78rem;color:var(--muted);margin:4px 0 0}
-  table{width:100%;border-collapse:collapse;font-size:.93rem}
-  td{padding:7px 0;border-bottom:1px solid var(--line)}
-  td.v{text-align:right;font-variant-numeric:tabular-nums}
-  tr.tot td{font-weight:700;border-bottom:none;padding-top:10px}
-  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .kpi{background:var(--soft);border-radius:10px;padding:12px}
-  .kpi .l{font-size:.78rem;color:var(--muted)}
-  .kpi .n{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .hint{font-size:.78rem;color:var(--muted);margin:6px 0 0}
+  .badge{display:inline-block;font-size:.74rem;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--accent);font-weight:600;margin-bottom:12px}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .kpi{background:var(--soft);border-radius:11px;padding:12px 14px}
+  .kpi .l{font-size:.76rem;color:var(--muted)}
+  .kpi .n{font-size:1.3rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .kpi.main{background:var(--accent);color:var(--accent-ink)}
+  .kpi.main .l{color:inherit;opacity:.85}
   .pos{color:var(--pos)} .neg{color:var(--neg)}
-  .note{font-size:.8rem;color:var(--muted);margin-top:16px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:0 0 8px;border-bottom:1px solid var(--line)}
+  th:first-child{text-align:left}
+  td{padding:8px 0;border-bottom:1px solid var(--line)}
+  td.v{text-align:right;font-variant-numeric:tabular-nums;padding-left:8px;white-space:nowrap}
+  td.t{font-weight:600}
+  tr.tot td{font-weight:700;border-bottom:none;padding-top:11px}
+  .grid>*{min-width:0}
+  @media (max-width:480px){
+    .card{padding:14px}
+    table{font-size:.76rem}
+    td.v{padding-left:4px}
+    th{font-size:.68rem}
+  }
+  .buyonly .so{display:none}
   .ratestbl td{font-size:.82rem;padding:5px 0}
+  footer{font-size:.8rem;color:var(--muted);padding-bottom:32px}
+  footer a{color:var(--accent)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Stock Trade Charges Calculator</h1>
-  <p class="sub">Indian equity (NSE/BSE) · Delivery, Intraday, Futures and Options · All charges, taxes and net P&amp;L</p>
+<header>
+  <div class="wrap">
+    <h1>Stock Trade Charges Calculator</h1>
+    <p>Indian equity on NSE &amp; BSE · Delivery, Intraday, Futures, Options</p>
+  </div>
+</header>
 
+<main class="wrap">
   <div class="grid">
-    <div class="card">
+    <section class="card">
       <h2>Trade details</h2>
       <div class="seg" id="seg">
         <button data-s="delivery" class="on">Delivery</button>
@@ -68,9 +94,10 @@
       </div>
       <div class="row3">
         <div><label for="buy" id="buyLbl">Buy price (₹)</label><input id="buy" type="number" inputmode="decimal" min="0" step="0.05" value="1000"></div>
-        <div><label for="sell" id="sellLbl">Sell price (₹)</label><input id="sell" type="number" inputmode="decimal" min="0" step="0.05" value="1050"></div>
+        <div><label for="sell"><span id="sellLbl">Sell price (₹)</span> <span class="opt">optional</span></label><input id="sell" type="number" inputmode="decimal" min="0" step="0.05" value="1050" placeholder="Leave empty"></div>
         <div><label for="qty" id="qtyLbl">Quantity</label><input id="qty" type="number" inputmode="numeric" min="0" step="1" value="100"></div>
       </div>
+      <p class="hint" id="modeHint"></p>
       <p class="hint" id="qtyHint"></p>
 
       <details open>
@@ -91,30 +118,22 @@
           <div id="capWrap"><label for="bCap" id="capLbl">Max per order (₹)</label><input id="bCap" type="number" step="1" min="0" value="20"></div>
           <div id="dpWrap"><label for="dp">DP charge on sell (₹, incl. GST)</label><input id="dp" type="number" step="0.01" min="0" value="15.34"></div>
         </div>
-        <p class="hint">Defaults follow a typical discount broker: ₹0 on delivery, lower of ₹20 or 0.03% on intraday &amp; futures, flat ₹20 on options. Change them to match your broker. Switching segment resets to these defaults.</p>
+        <p class="hint">Defaults follow a typical discount broker: ₹0 on delivery, lower of ₹20 or 0.03% on intraday &amp; futures, flat ₹20 on options. Switching segment resets to these defaults.</p>
       </details>
-    </div>
+    </section>
 
-    <div class="card">
+    <section class="card" id="resultCard">
       <h2>Result</h2>
+      <span class="badge" id="modeBadge">Buy + Sell</span>
       <div class="kpis">
-        <div class="kpi"><div class="l">Total charges</div><div class="n" id="kTot">₹0</div></div>
-        <div class="kpi"><div class="l">Net P&amp;L</div><div class="n" id="kNet">₹0</div></div>
-        <div class="kpi"><div class="l">Gross P&amp;L</div><div class="n" id="kGross">₹0</div></div>
-        <div class="kpi"><div class="l">Breakeven move / unit</div><div class="n" id="kBe">₹0</div></div>
+        <div class="kpi main"><div class="l">Total charges</div><div class="n" id="k1">₹0</div></div>
+        <div class="kpi"><div class="l" id="k2l">Net P&amp;L</div><div class="n" id="k2">₹0</div></div>
+        <div class="kpi"><div class="l" id="k3l">Gross P&amp;L</div><div class="n" id="k3">₹0</div></div>
+        <div class="kpi"><div class="l">Breakeven sell price</div><div class="n" id="k4">₹0</div></div>
       </div>
       <table>
-        <tbody>
-          <tr><td>Turnover</td><td class="v" id="rTurn"></td></tr>
-          <tr><td>Brokerage</td><td class="v" id="rBrok"></td></tr>
-          <tr><td id="sttLbl">STT</td><td class="v" id="rStt"></td></tr>
-          <tr><td>Exchange transaction charges</td><td class="v" id="rTxn"></td></tr>
-          <tr><td>SEBI turnover fee</td><td class="v" id="rSebi"></td></tr>
-          <tr><td>GST (18%)</td><td class="v" id="rGst"></td></tr>
-          <tr><td>Stamp duty</td><td class="v" id="rStamp"></td></tr>
-          <tr><td>DP charges</td><td class="v" id="rDp"></td></tr>
-          <tr class="tot"><td>Total charges</td><td class="v" id="rTot"></td></tr>
-        </tbody>
+        <thead><tr><th>Charge</th><th>Buy</th><th class="so">Sell</th><th class="so">Total</th></tr></thead>
+        <tbody id="tbody"></tbody>
       </table>
       <p class="hint" id="pctOf"></p>
 
@@ -122,38 +141,53 @@
         <summary>Rates used for this segment</summary>
         <table class="ratestbl"><tbody id="ratesBody"></tbody></table>
       </details>
-    </div>
+    </section>
   </div>
+</main>
 
-  <p class="note">
-    Statutory rates as of Nov 2026, including the F&amp;O STT increase effective 1 April 2026 (futures 0.05%, options 0.15% on sell-side premium). STT is rounded to the nearest rupee per side. GST is charged on brokerage + exchange charges + SEBI fee. NSE IPFT (₹0.01/crore) and call-and-trade / auto-square-off fees are excluded. Exercised option STT (0.15% of intrinsic value) is not modelled. This is an estimate; your contract note is final.
-  </p>
-</div>
+<footer class="wrap">
+  Statutory rates as of Nov 2026, including the F&amp;O STT increase effective 1 April 2026 (futures 0.05%, options 0.15% on sell-side premium). STT is rounded to the nearest rupee per side. GST is charged on brokerage + exchange charges + SEBI fee. Breakeven sell price includes the charges of the sell itself. NSE IPFT (₹0.01/crore), STT on exercised options and call-and-trade / auto-square-off fees are excluded. Estimates only; your contract note is final.
+  · <a href="https://github.com/swethaskamath/stock-expense-calculator">Source on GitHub</a>
+</footer>
 
 <script>
 const RATES = {
   delivery: { stt:{buy:0.001,sell:0.001}, txn:{NSE:0.0000307,BSE:0.0000375}, stamp:0.00015, dp:true,
-              brok:{mode:'zero',pct:0.03,cap:20}, sttLabel:'STT (0.1% buy & sell)' },
+              brok:{mode:'zero',pct:0.03,cap:20}, sttLabel:'STT' },
   intraday: { stt:{buy:0,sell:0.00025}, txn:{NSE:0.0000307,BSE:0.0000375}, stamp:0.00003, dp:false,
-              brok:{mode:'pctcap',pct:0.03,cap:20}, sttLabel:'STT (0.025% sell)' },
+              brok:{mode:'pctcap',pct:0.03,cap:20}, sttLabel:'STT' },
   futures:  { stt:{buy:0,sell:0.0005}, txn:{NSE:0.0000183,BSE:0}, stamp:0.00002, dp:false,
-              brok:{mode:'pctcap',pct:0.03,cap:20}, sttLabel:'STT (0.05% sell)' },
+              brok:{mode:'pctcap',pct:0.03,cap:20}, sttLabel:'STT' },
   options:  { stt:{buy:0,sell:0.0015}, txn:{NSE:0.0003553,BSE:0.000325}, stamp:0.00003, dp:false,
-              brok:{mode:'flat',pct:0.03,cap:20}, sttLabel:'STT (0.15% sell premium)' }
+              brok:{mode:'flat',pct:0.03,cap:20}, sttLabel:'STT (on premium)' }
 };
 const SEBI = 10/1e7, GST = 0.18;
 let seg = 'delivery', exch = 'NSE';
 const $ = id => document.getElementById(id);
-const fmt = n => '₹' + n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt = n => (n<0?'−₹':'₹') + Math.abs(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const pct = r => (r*100).toFixed(5).replace(/0+$/,'').replace(/\.$/,'') + '%';
 
 function brokerage(value){
   const m = $('bMode').value, p = (+$('bPct').value||0)/100, cap = +$('bCap').value||0;
-  if (value <= 0) return 0;
-  if (m === 'zero') return 0;
+  if (value <= 0 || m === 'zero') return 0;
   if (m === 'flat') return cap;
   if (m === 'pct') return value*p;
   return Math.min(value*p, cap);
+}
+
+// Charges for one side of the trade
+function side(value, isBuy){
+  const R = RATES[seg];
+  const z = {brok:0,stt:0,txn:0,sebi:0,gst:0,stamp:0,dp:0,total:0};
+  if (value <= 0) return z;
+  const brok = brokerage(value);
+  const stt = Math.round(value * (isBuy ? R.stt.buy : R.stt.sell));
+  const txn = value * R.txn[exch];
+  const sebi = value * SEBI;
+  const gst = (brok + txn + sebi) * GST;
+  const stamp = isBuy ? Math.round(value * R.stamp * 100)/100 : 0;
+  const dp = (!isBuy && R.dp) ? (+$('dp').value||0) : 0;
+  return {brok,stt,txn,sebi,gst,stamp,dp,total:brok+stt+txn+sebi+gst+stamp+dp};
 }
 
 function syncBrokUI(){
@@ -171,52 +205,71 @@ function setDefaults(){
   $('buyLbl').textContent = opt ? 'Buy premium (₹)' : 'Buy price (₹)';
   $('sellLbl').textContent = opt ? 'Sell premium (₹)' : 'Sell price (₹)';
   $('qtyLbl').textContent = (seg==='futures'||opt) ? 'Quantity (units)' : 'Quantity';
-  $('qtyHint').textContent = (seg==='futures'||opt) ? 'Enter total units = lots × lot size (e.g. 2 lots of NIFTY at 75 = 150).' : '';
+  $('qtyHint').textContent = (seg==='futures'||opt) ? 'Enter total units = lots × lot size (e.g. 2 lots of 75 = 150).' : '';
   syncBrokUI();
 }
 
 function calc(){
   const R = RATES[seg];
-  const bp = Math.max(0,+$('buy').value||0), sp = Math.max(0,+$('sell').value||0), q = Math.max(0,+$('qty').value||0);
-  const bv = bp*q, sv = sp*q, turn = bv+sv;
+  const bp = Math.max(0,+$('buy').value||0), q = Math.max(0,+$('qty').value||0);
+  const sellRaw = $('sell').value.trim();
+  const buyOnly = sellRaw === '';
+  const sp = buyOnly ? 0 : Math.max(0,+sellRaw||0);
+  const bv = bp*q, sv = sp*q;
+  const B = side(bv, true), S = side(sv, false);
+  const total = B.total + S.total;
 
-  const brok = brokerage(bv) + brokerage(sv);
-  const stt = Math.round(bv*R.stt.buy) + Math.round(sv*R.stt.sell);
-  const txn = turn * R.txn[exch];
-  const sebi = turn * SEBI;
-  const gst = (brok + txn + sebi) * GST;
-  const stamp = Math.round(bv * R.stamp * 100)/100;
-  const dp = (R.dp && sv>0) ? (+$('dp').value||0) : 0;
-  const total = brok + stt + txn + sebi + gst + stamp + dp;
-  const gross = sv - bv, net = gross - total;
+  // Breakeven sell price: price where sell proceeds cover buy value + all charges
+  let be = 0;
+  if (q > 0 && bv > 0){
+    be = (bv + B.total)/q;
+    for (let i=0;i<8;i++) be = (bv + B.total + side(be*q,false).total)/q;
+  }
 
-  $('rTurn').textContent = fmt(turn);
-  $('rBrok').textContent = fmt(brok);
-  $('sttLbl').textContent = R.sttLabel;
-  $('rStt').textContent = fmt(stt);
-  $('rTxn').textContent = fmt(txn);
-  $('rSebi').textContent = fmt(sebi);
-  $('rGst').textContent = fmt(gst);
-  $('rStamp').textContent = fmt(stamp);
-  $('rDp').textContent = fmt(dp);
-  $('rTot').textContent = fmt(total);
-  $('kTot').textContent = fmt(total);
-  $('kGross').textContent = fmt(gross);
-  $('kGross').className = 'n ' + (gross>0?'pos':gross<0?'neg':'');
-  $('kNet').textContent = fmt(net);
-  $('kNet').className = 'n ' + (net>0?'pos':net<0?'neg':'');
-  $('kBe').textContent = q>0 ? fmt(total/q) : '—';
-  $('pctOf').textContent = turn>0 ? `Charges are ${(total/turn*100).toFixed(3)}% of turnover` + (gross>0 ? ` and ${(total/gross*100).toFixed(1)}% of gross profit.` : '.') : '';
+  $('resultCard').classList.toggle('buyonly', buyOnly);
+  $('modeBadge').textContent = buyOnly ? 'Buy only' : 'Buy + Sell';
+  $('modeHint').textContent = buyOnly ? 'No sell price: showing the cost of buying only.' : 'Clear the sell price to see the cost of buying only.';
+
+  $('k1').textContent = fmt(total);
+  if (buyOnly){
+    $('k2l').textContent = 'Total buy cost'; $('k2').textContent = fmt(bv + B.total); $('k2').className='n';
+    $('k3l').textContent = 'Cost per unit (incl. charges)'; $('k3').textContent = q>0 ? fmt((bv+B.total)/q) : '—'; $('k3').className='n';
+  } else {
+    const gross = sv - bv, net = gross - total;
+    $('k2l').textContent = 'Net P&L'; $('k2').textContent = fmt(net);
+    $('k2').className = 'n ' + (net>0?'pos':net<0?'neg':'');
+    $('k3l').textContent = 'Gross P&L'; $('k3').textContent = fmt(gross);
+    $('k3').className = 'n ' + (gross>0?'pos':gross<0?'neg':'');
+  }
+  $('k4').textContent = be>0 ? fmt(be) : '—';
 
   const rows = [
+    ['Trade value', bv, sv, true],
+    ['Brokerage', B.brok, S.brok],
+    [R.sttLabel, B.stt, S.stt],
+    ['Exchange txn charges', B.txn, S.txn],
+    ['SEBI fee', B.sebi, S.sebi],
+    ['GST (18%)', B.gst, S.gst],
+    ['Stamp duty', B.stamp, S.stamp],
+  ];
+  if (R.dp) rows.push(['DP charges', B.dp, S.dp]);
+  let html = rows.map(([n,b,s,isVal]) =>
+    `<tr${isVal?' style="color:var(--muted)"':''}><td>${n}</td><td class="v">${fmt(b)}</td><td class="v so">${fmt(s)}</td><td class="v t so">${fmt(b+s)}</td></tr>`).join('');
+  html += `<tr class="tot"><td>Total charges</td><td class="v">${fmt(B.total)}</td><td class="v so">${fmt(S.total)}</td><td class="v so">${fmt(total)}</td></tr>`;
+  $('tbody').innerHTML = html;
+
+  const turn = bv+sv, gross = sv-bv;
+  $('pctOf').textContent = turn>0 ? `Charges are ${(total/turn*100).toFixed(3)}% of turnover` + (!buyOnly && gross>0 ? ` and ${(total/gross*100).toFixed(1)}% of gross profit.` : '.') : '';
+
+  const rr = [
     ['STT buy / sell', `${pct(R.stt.buy)} / ${pct(R.stt.sell)}`],
-    [`Exchange txn (${exch})`, pct(R.txn[exch]) + ' of turnover'],
-    ['SEBI fee', '₹10 per crore'],
-    ['Stamp duty (buy side)', pct(R.stamp)],
+    [`Exchange txn (${exch})`, pct(R.txn[exch]) + ' each side'],
+    ['SEBI fee', '₹10 per crore each side'],
+    ['Stamp duty', pct(R.stamp) + ' buy side'],
     ['GST', '18% on brokerage + txn + SEBI'],
   ];
-  if (R.dp) rows.push(['DP charge', 'Per scrip, on sell day']);
-  $('ratesBody').innerHTML = rows.map(r=>`<tr><td>${r[0]}</td><td class="v">${r[1]}</td></tr>`).join('');
+  if (R.dp) rr.push(['DP charge', 'Per scrip, sell side']);
+  $('ratesBody').innerHTML = rr.map(r=>`<tr><td>${r[0]}</td><td class="v">${r[1]}</td></tr>`).join('');
 }
 
 document.querySelectorAll('#seg button').forEach(b=>b.addEventListener('click',()=>{
